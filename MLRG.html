@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Level Recipe Guide</title>
+  <style>
+    :root {
+      --primary-color: #5cb85c;
+      --primary-hover: #4cae4c;
+      --secondary-color: #6c757d;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fdfdfd;
+      color: #333;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+    
+    nav {
+      background: #fff;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    nav .btn {
+      transition: transform 0.3s ease;
+      margin-left: 0.5rem;
+    }
+    
+    nav .btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .hero {
+      padding: 4rem 2rem;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') center/cover no-repeat;
+      color: #fff;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    
+    .filters, .recipes, .profile, .recipe-detail, .dashboard, .auth {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .recipe-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .recipe-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .recipe-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    
+    .recipe-card-content {
+      padding: 1rem;
+    }
+    
+    .recipe-card h3 {
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+    
+    .badge-beginner {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .badge-intermediate {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .badge-advanced {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 5px;
+      background: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    input[type="text"], 
+    input[type="number"], 
+    input[type="email"], 
+    input[type="password"],
+    textarea {
+      display: block;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    textarea {
+      min-height: 100px;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .trophy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .trophy-card {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    
+    .trophy-card img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--primary-color);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .rating-stars {
+      color: #ffc107;
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    
+    .review-card {
+      padding: 1rem;
+      margin: 1rem 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary-color);
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">Recipe Guide</div>
+    <div>
+      <button class="btn btn-outline" onclick="renderRecipes()">Home</button>
+      <button class="btn btn-outline" onclick="showSection('profile')">Profile</button>
+      <button class="btn btn-outline" onclick="showSection('dashboard')">Dashboard</button>
+      <button class="btn" id="authButton" onclick="showSection('auth')">Login</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>Welcome to the Multi-Level Recipe Guide</h1>
+    <p>Explore and master recipes based on your cooking level.</p>
+  </div>
+
+  <div class="container">
+    <!-- Home/Recipes Section -->
+    <div class="filters">
+      <h2>Filter Recipes</h2>
+      <button class="btn" onclick="filterRecipes('all')">All Recipes</button>
+      <button class="btn" onclick="filterRecipes('beginner')">Beginner</button>
+      <button class="btn" onclick="filterRecipes('intermediate')">Intermediate</button>
+      <button class="btn" onclick="filterRecipes('advanced')">Advanced</button>
+    </div>
+
+    <div class="recipes" id="home">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading recipes...</p>
+      </div>
+    </div>
+
+    <!-- Recipe Detail Section -->
+    <div class="recipe-detail hidden" id="recipeDetail">
+      <button class="btn btn-outline" onclick="renderRecipes()">&larr; Back to Recipes</button>
+      <div id="recipeContent"></div>
+      
+      <h3>Reviews</h3>
+      <div id="reviews"></div>
+      
+      <div class="form-group">
+        <h4>Add Your Review</h4>
+        <textarea id="comment" placeholder="Share your thoughts about this recipe..."></textarea>
+        <div>
+          <label for="rating">Rating:</label>
+          <select id="rating">
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
+          </select>
+        </div>
+        <button class="btn" onclick="submitReview()">Submit Review</button>
+      </div>
+      
+      <button class="btn" id="completeButton" onclick="completeRecipe()">Mark as Complete</button>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile hidden" id="profile">
+      <h2>My Profile</h2>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p><strong>Cooking Level:</strong> <span id="userLevel" class="badge badge-beginner">Beginner</span></p>
+      <p><strong>Recipes Completed:</strong> <span id="completedCount">0</span></p>
+      
+      <h3>My Trophies</h3>
+      <div class="trophy-grid" id="trophyList"></div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div class="dashboard hidden" id="dashboard">
+      <h2>My Cooking Dashboard</h2>
+      <div id="dashboardContent"></div>
+    </div>
+
+    <!-- Auth Section -->
+    <div class="auth hidden" id="auth">
+      <h2 id="authTitle">Login</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password">
+      </div>
+      <div id="extraFields" style="display: none;">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+      </div>
+      <button class="btn" id="authActionButton" onclick="handleAuth()">Login</button>
+      <p>
+        <span id="toggleText">Don't have an account?</span>
+        <button class="btn btn-outline" onclick="toggleAuth()">Sign up</button>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Current user state
+    let currentUser = null;
+    let isSignup = false;
+    let currentRecipeId = null;
+    
+    // DOM Elements
+    const authButton = document.getElementById('authButton');
+    const authActionButton = document.getElementById('authActionButton');
+    const authTitle = document.getElementById('authTitle');
+    const toggleText = document.getElementById('toggleText');
+    const extraFields = document.getElementById('extraFields');
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuthState();
+      renderRecipes();
+    });
+    
+    // Check if user is logged in (will be replaced with actual auth check)
+    function checkAuthState() {
+      // In a real app, this would check localStorage or cookies for auth token
+      if (currentUser) {
+        authButton.textContent = 'Logout';
+        authButton.onclick = logout;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.onclick = () => showSection('auth');
+      }
+    }
+    
+    function toggleAuth() {
+      isSignup = !isSignup;
+      authTitle.textContent = isSignup ? 'Sign Up' : 'Login';
+      authActionButton.textContent = isSignup ? 'Sign Up' : 'Login';
+      toggleText.textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+      extraFields.style.display = isSignup ? 'block' : 'none';
+    }
+    
+    async function handleAuth() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      if (!username || !password) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      
+      if (isSignup) {
+        const email = document.getElementById('email').value.trim();
+        if (!email) {
+          alert('Please provide an email address.');
+          return;
+        }
+        
+        try {
+          // This would be replaced with actual API call to your backend
+          // const response = await fetch('/api/register', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({ username, email, password })
+          // });
+          // const data = await response.json();
+          
+          // Simulated response
+          const data = { 
+            success: true, 
+            user: { 
+              id: 1, 
+              username, 
+              email, 
+              cooking_level: 'beginner',
+              experience_points: 0
+            } 
+          };
+          
+          if (data.success) {
+            currentUser = data.user;
+            checkAuthState();
+            showSection('home');
+            alert('Registration successful!');
+            clearAuthForm();
+          } else {
+            alert('Registration failed. Please try again.');
+          }
+        } catch (error) {
+          console.error('Registration error:', error);
+          alert('An error occurred during registration.');
+        }
+      } else {
+        try {
+          // This would be replaced with actual API call to your backend
+          // const response = await fetch('/api/login', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({ username, password })
+          // });
+          // const data = await response.json();
+          
+          // Simulated response
+          const data = { 
+            success: true, 
+            user: { 
+              id: 1, 
+              username: 'testuser', 
+              email: 'test@example.com', 
+              cooking_level: 'beginner',
+              experience_points: 0
+            } 
+          };
+          
+          if (data.success) {
+            currentUser = data.user;
+            checkAuthState();
+            showSection('home');
+            alert('Login successful!');
+            clearAuthForm();
+          } else {
+            alert('Invalid credentials. Please try again.');
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          alert('An error occurred during login.');
+        }
+      }
+    }
+    
+    function logout() {
+      currentUser = null;
+      checkAuthState();
+      showSection('home');
+      alert('You have been logged out.');
+    }
+    
+    function clearAuthForm() {
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('email').value = '';
+    }
+    
+    async function renderRecipes(level = 'all') {
+      showSection('home');
+      const container = document.getElementById('home');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading recipes...</p></div>';
+      
+      try {
+        // This would be replaced with actual API call to your backend
+        // const response = await fetch(`/api/recipes?level=${level}`);
+        // const recipes = await response.json();
+        
+        // Simulated data that matches your SQL schema
+        const recipes = [
+          {
+            recipe_id: 1,
+            title: 'Classic Pancakes',
+            description: 'Fluffy homemade pancakes perfect for breakfast',
+            ingredients: '1 cup flour\n1 tbsp sugar\n2 tsp baking powder\n1/4 tsp salt\n1 cup milk\n1 egg\n2 tbsp melted butter',
+            instructions: '1. Mix dry ingredients\n2. Add wet ingredients\n3. Cook on griddle\n4. Serve with syrup',
+            preparation_time: 10,
+            cooking_time: 15,
+            difficulty_level: 'beginner',
+            servings: 4,
+            image_url: 'https://images.unsplash.com/photo-1559562897-2f4b9c3b3b3b',
+            user_id: 1,
+            categories: ['Breakfast']
+          },
+          {
+            recipe_id: 2,
+            title: 'Beef Bourguignon',
+            description: 'Classic French beef stew',
+            ingredients: '2 lbs beef chuck\n1 bottle red wine\n1 onion\n2 carrots\n3 cloves garlic\n1 tbsp tomato paste\n1 tsp thyme',
+            instructions: '1. Brown the beef\n2. Sauté vegetables\n3. Deglaze with wine\n4. Slow cook for 3 hours',
+            preparation_time: 30,
+            cooking_time: 180,
+            difficulty_level: 'advanced',
+            servings: 6,
+            image_url: 'https://images.unsplash.com/photo-1547592180-85f173990554',
+            user_id: 2,
+            categories: ['Dinner']
+          }
+        ];
+        
+        if (recipes.length === 0) {
+          container.innerHTML = '<p>No recipes found. Try a different filter.</p>';
+          return;
+        }
+        
+        container.innerHTML = `
+          <div class="recipe-grid">
+            ${recipes.map(recipe => `
+              <div class="recipe-card">
+                <img src="${recipe.image_url || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="${recipe.title}">
+                <div class="recipe-card-content">
+                  <h3>${recipe.title}</h3>
+                  <span class="badge ${getBadgeClass(recipe.difficulty_level)}">${recipe.difficulty_level}</span>
+                  <p>${recipe.description || ''}</p>
+                  <button class="btn" onclick="showRecipeDetail(${recipe.recipe_id})">View Recipe</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading recipes:', error);
+        container.innerHTML = '<p>Error loading recipes. Please try again later.</p>';
+      }
+    }
+    
+    function getBadgeClass(level) {
+      switch(level.toLowerCase()) {
+        case 'beginner': return 'badge-beginner';
+        case 'intermediate': return 'badge-intermediate';
+        case 'advanced': return 'badge-advanced';
+        default: return '';
+      }
+    }
+    
+    async function showRecipeDetail(recipeId) {
+      currentRecipeId = recipeId;
+      showSection('recipeDetail');
+      const recipeContent = document.getElementById('recipeContent');
+      recipeContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading recipe...</p></div>';
+      
+      try {
+        // This would be replaced with actual API call to your backend
+        // const response = await fetch(`/api/recipes/${recipeId}`);
+        // const recipe = await response.json();
+        
+        // Simulated data
+        const recipe = {
+          recipe_id: 1,
+          title: 'Classic Pancakes',
+          description: 'Fluffy homemade pancakes perfect for breakfast',
+          ingredients: '1 cup flour\n1 tbsp sugar\n2 tsp baking powder\n1/4 tsp salt\n1 cup milk\n1 egg\n2 tbsp melted butter',
+          instructions: '1. Mix dry ingredients\n2. Add wet ingredients\n3. Cook on griddle\n4. Serve with syrup',
+          preparation_time: 10,
+          cooking_time: 15,
+          difficulty_level: 'beginner',
+          servings: 4,
+          image_url: 'https://images.unsplash.com/photo-1559562897-2f4b9c3b3b3b',
+          user_id: 1,
+          categories: ['Breakfast'],
+          reviews: [
+            { review_id: 1, user_id: 2, username: 'foodlover', rating: 5, comment: 'Perfect pancakes!', created_at: '2023-05-15' },
+            { review_id: 2, user_id: 3, username: 'chef123', rating: 4, comment: 'Great basic recipe', created_at: '2023-05-10' }
+          ]
+        };
+        
+        // Check if recipe is completed by user (would come from API in real app)
+        const isCompleted = false; // Would be fetched from user progress
+        
+        recipeContent.innerHTML = `
+          <div class="recipe-header">
+            <h2>${recipe.title}</h2>
+            <div>
+              <span class="badge ${getBadgeClass(recipe.difficulty_level)}">${recipe.difficulty_level}</span>
+              <span>${recipe.preparation_time + recipe.cooking_time} min • ${recipe.servings} servings</span>
+            </div>
+          </div>
+          
+          <div class="recipe-image">
+            <img src="${recipe.image_url || 'https://via.placeholder.com/800x400?text=No+Image'}" alt="${recipe.title}" style="width:100%; max-height:400px; object-fit:cover; border-radius:8px;">
+          </div>
+          
+          <div class="recipe-description">
+            <p>${recipe.description || ''}</p>
+          </div>
+          
+          <div class="recipe-details">
+            <div class="ingredients">
+              <h3>Ingredients</h3>
+              <ul>
+                ${recipe.ingredients.split('\n').map(ing => `<li>${ing}</li>`).join('')}
+              </ul>
+            </div>
+            
+            <div class="instructions">
+              <h3>Instructions</h3>
+              <ol>
+                ${recipe.instructions.split('\n').map(step => `<li>${step}</li>`).join('')}
+              </ol>
+            </div>
+          </div>
+        `;
+        
+        // Render reviews
+        const reviewsContainer = document.getElementById('reviews');
+        if (recipe.reviews && recipe.reviews.length > 0) {
+          reviewsContainer.innerHTML = `
+            <h3>Reviews (${recipe.reviews.length})</h3>
+            ${recipe.reviews.map(review => `
+              <div class="review-card">
+                <div class="review-header">
+                  <strong>${review.username}</strong>
+                  <div class="rating-stars">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                  <small>${new Date(review.created_at).toLocaleDateString()}</small>
+                </div>
+                <p>${review.comment}</p>
+              </div>
+            `).join('')}
+          `;
+        } else {
+          reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review!</p>';
+        }
+        
+        // Update complete button based on completion status
+        const completeButton = document.getElementById('completeButton');
+        completeButton.textContent = isCompleted ? '✓ Already Completed' : 'Mark as Complete';
+        completeButton.disabled = isCompleted;
+        completeButton.style.backgroundColor = isCompleted ? '#6c757d' : '';
+      } catch (error) {
+        console.error('Error loading recipe:', error);
+        recipeContent.innerHTML = '<p>Error loading recipe. Please try again later.</p>';
+      }
+    }
+    
+    async function submitReview() {
+      if (!currentUser) {
+        alert('Please login to submit a review.');
+        showSection('auth');
+        return;
+      }
+      
+      const comment = document.getElementById('comment').value.trim();
+      const rating = document.getElementById('rating').value;
+      
+      if (!comment) {
+        alert('Please enter a review comment.');
+        return;
+      }
+      
+      try {
+        // This would be replaced with actual API call to your backend
+        // const response = await fetch(`/api/recipes/${currentRecipeId}/reviews`, {
+        //   method: 'POST',
+        //   headers: { 
+        //     'Content-Type': 'application/json',
+        //     'Authorization': `Bearer ${authToken}` 
+        //   },
+        //   body: JSON.stringify({ rating, comment })
+        // });
+        // const data = await response.json();
+        
+        // Simulated response
+        const data = { success: true };
+        
+        if (data.success) {
+          alert('Review submitted successfully!');
+          document.getElementById('comment').value = '';
+          document.getElementById('rating').value = '5';
+          showRecipeDetail(currentRecipeId); // Refresh to show new review
+        } else {
+          alert('Failed to submit review. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error submitting review:', error);
+        alert('An error occurred while submitting your review.');
+      }
+    }
+    
+    async function completeRecipe() {
+      if (!currentUser) {
+        alert('Please login to track your progress.');
+        showSection('auth');
+        return;
+      }
+      
+      try {
+        // This would be replaced with actual API call to your backend
+        // const response = await fetch(`/api/user-progress`, {
+        //   method: 'POST',
+        //   headers: { 
+        //     'Content-Type': 'application/json',
+        //     'Authorization': `Bearer ${authToken}` 
+        //   },
+        //   body: JSON.stringify({ 
+        //     recipe_id: currentRecipeId,
+        //     status: 'completed' 
+        //   })
+        // });
+        // const data = await response.json();
+        
+        // Simulated response
+        const data = { success: true };
+        
+        if (data.success) {
+          alert('Recipe marked as complete! Your progress has been saved.');
+          document.getElementById('completeButton').textContent = '✓ Already Completed';
+          document.getElementById('completeButton').disabled = true;
+          document.getElementById('completeButton').style.backgroundColor = '#6c757d';
+          updateUserProfile(); // Refresh profile data
+        } else {
+          alert('Failed to mark recipe as complete. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error completing recipe:', error);
+        alert('An error occurred while saving your progress.');
+      }
+    }
+    
+    async function updateUserProfile() {
+      if (!currentUser) return;
+      
+      try {
+        // This would be replaced with actual API calls to your backend
+        // const [userResponse, progressResponse, trophiesResponse] = await Promise.all([
+        //   fetch(`/api/users/${currentUser.id}`),
+        //   fetch(`/api/user-progress?user_id=${currentUser.id}`),
+        //   fetch(`/api/user-trophies?user_id=${currentUser.id}`)
+        // ]);
+        // const userData = await userResponse.json();
+        // const progressData = await progressResponse.json();
+        // const trophiesData = await trophiesResponse.json();
+        
+        // Simulated data
+        const userData = {
+          id: 1,
+          username: 'testuser',
+          cooking_level: 'beginner',
+          experience_points: 50
+        };
+        
+        const progressData = {
+          completed_recipes: 3,
+          total_recipes: 20
+        };
+        
+        const trophiesData = [
+          { trophy_id: 1, name: 'First Steps', description: 'Complete 5 recipes', image_url: '/trophies/bronze.png' }
+        ];
+        
+        // Update profile section
+        document.getElementById('userLevel').textContent = userData.cooking_level;
+        document.getElementById('userLevel').className = `badge ${getBadgeClass(userData.cooking_level)}`;
+        document.getElementById('completedCount').textContent = progressData.completed_recipes;
+        
+        // Update progress bar
+        const progressPercent = Math.min(100, (progressData.completed_recipes / 25) * 100);
+        document.getElementById('progressFill').style.width = `${progressPercent}%`;
+        
+        // Update trophies
+        const trophyList = document.getElementById('trophyList');
+        if (trophiesData.length > 0) {
+          trophyList.innerHTML = trophiesData.map(trophy => `
+            <div class="trophy-card">
+              <img src="${trophy.image_url || 'https://via.placeholder.com/60x60?text=Trophy'}" alt="${trophy.name}">
+              <h4>${trophy.name}</h4>
+              <p>${trophy.description}</p>
+            </div>
+          `).join('');
+        } else {
+          trophyList.innerHTML = '<p>No trophies earned yet. Keep cooking to earn some!</p>';
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    }
+    
+    function showSection(sectionId) {
+      if (!currentUser && sectionId !== 'home' && sectionId !== 'auth') {
+        alert('Please login to access this section.');
+        showSection('auth');
+        return;
+      }
+      
+      // Hide all sections
+      document.querySelectorAll('.filters, .recipes, .recipe-detail, .profile, .dashboard, .auth')
+        .forEach(el => el.classList.add('hidden'));
+      
+      // Show the requested section
+      document.getElementById(sectionId)?.classList.remove('hidden');
+      
+      // Update profile data if showing profile section
+      if (sectionId === 'profile' && currentUser) {
+        updateUserProfile();
+      }
+    }
+    
+    function filterRecipes(level) {
+      renderRecipes(level);
+    }
+  </script>
+</body>
+</html>
